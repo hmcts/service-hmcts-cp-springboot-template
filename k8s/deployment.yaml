@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: case-document-knowledge-service
+  labels: { app: case-document-knowledge-service }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: case-document-knowledge-service } }
+  template:
+    metadata:
+      labels: { app: case-document-knowledge-service }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+      containers:
+        - name: case-document-knowledge-service
+          image: your.registry/case-document-knowledge-service:${IMAGE_TAG:-0.1.0}
+          imagePullPolicy: IfNotPresent
+          ports: [ { containerPort: 8080, name: http } ]
+          env:
+            - { name: SPRING_PROFILES_ACTIVE, value: "prod" }
+            - { name: CLUSTER_NAME, valueFrom: { fieldRef: { fieldPath: metadata.namespace } } }
+            - { name: REGION, value: "uk" }
+            - { name: SECURITY_JWT_ENABLED, value: "true" }
+            - { name: OIDC_ISSUER_URI, valueFrom: { secretKeyRef: { name: case-document-knowledge-service-idp, key: issuer } } }
+            - { name: SPRING_DATASOURCE_URL, valueFrom: { secretKeyRef: { name: case-document-knowledge-service-db, key: url } } }
+            - { name: SPRING_DATASOURCE_USERNAME, valueFrom: { secretKeyRef: { name: case-document-knowledge-service-db, key: username } } }
+            - { name: SPRING_DATASOURCE_PASSWORD, valueFrom: { secretKeyRef: { name: case-document-knowledge-service-db, key: password } } }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ "ALL" ] }
+          readinessProbe: { httpGet: { path: /actuator/health/readiness, port: 8080 }, initialDelaySeconds: 10, periodSeconds: 10 }
+          livenessProbe:  { httpGet: { path: /actuator/health/liveness,  port: 8080 }, initialDelaySeconds: 20, periodSeconds: 20 }
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits:   { cpu: "1",    memory: "768Mi" }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: case-document-knowledge-service-pdb }
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app: case-document-knowledge-service } }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: case-document-knowledge-service }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: case-document-knowledge-service }
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }

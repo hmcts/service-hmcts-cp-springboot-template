@@ -1,0 +1,76 @@
+image:
+  repository: your.registry/case-document-knowledge-service
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 1
+    memory: 768Mi
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  REGION: "uk"
+
+postgres:
+  secretName: case-document-knowledge-service-db
+  urlKey: url
+  userKey: username
+  passwordKey: password
+
+security:
+  jwtEnabled: true
+  oidcIssuerSecretName: case-document-knowledge-service-idp
+  oidcIssuerKey: issuer
+
+ingress:
+  enabled: false
+  className: ""
+  hosts: []
+  tls: []
+
+monitoring:
+  scrape: true
+  serviceMonitor:
+    enabled: true
+    namespace: ""
+    interval: 30s
+    path: /actuator/prometheus
+    portName: http
+
+pdb:
+  minAvailable: 1
+
+hpa:
+  enabled: true
+  min: 2
+  max: 6
+  cpuUtilization: 70
+
+networkPolicy:
+  enabled: true
+  allowIngressFromNamespaces: []
+  allowEgressToCIDRs: []
+
+keyVault:
+  enabled: false
+  tenantId: ""
+  vaultName: ""
+  objects: |-
+    array:
+      - objectName: app-password
+        objectType: secret
+        objectAlias: APP_PASSWORD
+syncAsK8sSecret:
+  enabled: true
+  name: kv-synced

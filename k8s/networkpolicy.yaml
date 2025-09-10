@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: case-document-knowledge-service-default-deny }
+spec:
+  podSelector: { matchLabels: { app: case-document-knowledge-service } }
+  policyTypes: [ Egress, Ingress ]
+  ingress:
+    - from: []
+      ports: [ { protocol: TCP, port: 8080 } ]
+  egress:
+    - to: []

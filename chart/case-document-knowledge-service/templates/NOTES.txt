@@ -1,0 +1,6 @@
+1) If ingress enabled, check:
+   kubectl get ingress -n {{ .Release.Namespace }} {{ include ".Chart.Name" . }}
+2) ServiceMonitor scrapes /actuator/prometheus if CRD installed.
+3) Azure Key Vault CSI:
+   - Install secrets-store-csi-driver + azure provider.
+   - Set values.keyVault.enabled=true + tenantId + vaultName + objects.

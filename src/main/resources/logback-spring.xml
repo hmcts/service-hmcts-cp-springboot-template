@@ -1,0 +1,9 @@
+<configuration>
+  <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
+      <customFields>{"app":"case-document-knowledge-service","service":"case-document-knowledge-service"}</customFields>
+    </encoder>
+  </appender>
+  <root level="INFO"><appender-ref ref="JSON"/></root>
+</configuration>
