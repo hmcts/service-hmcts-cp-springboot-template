@@ -18,7 +18,7 @@ Spring Boot 3 (Java 17) REST API with OpenAPI docs, PostgreSQL + Flyway, product
 
 ## Tech Stack
 
-- Spring Boot **3.3.x**, Java **17**
+- Spring Boot **3.5.x**, Java **21**
 - springdoc-openapi **2.x**
 - Spring Data JPA, **PostgreSQL**, Flyway (+ `flyway-database-postgresql`)
 - Micrometer + **Prometheus**, OpenTelemetry OTLP exporter
@@ -29,7 +29,7 @@ Spring Boot 3 (Java 17) REST API with OpenAPI docs, PostgreSQL + Flyway, product
 ## Quickstart
 
 ### Prerequisites
-- Java 17
+- Java 21+
 - Maven 3.9+
 - Docker (optional, for Compose)
 
