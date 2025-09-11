@@ -1,9 +1,4 @@
-# case-document-knowledge-service
-
-**AI-powered answers for case documents — every response cited and auditable.**
-Spring Boot 3 (Java 17) REST API with OpenAPI docs, PostgreSQL + Flyway, production-ready observability, and quality gates (Checkstyle, SpotBugs, JaCoCo).
-
----
+# reference-service-hmcts-cp-springboot-template
 
 ## Features
 
